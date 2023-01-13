@@ -10,14 +10,14 @@
 
 
 ###> symfony/framework-bundle ###
-/symfony/config/secrets/prod/prod.decrypt.private.php
-/symfony/public/bundles/
-/symfony/var/
-/symfony/vendor/
+/phpfpm/symfony/config/secrets/prod/prod.decrypt.private.php
+/phpfpm/symfony/public/bundles/
+/phpfpm/symfony/var/
+/phpfpm/symfony/vendor/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
-/symfony/.phpunit
-/symfony/.phpunit.result.cache
-/symfony/phpunit.xml
+/phpfpm/symfony/.phpunit
+/phpfpm/symfony/.phpunit.result.cache
+/phpfpm/symfony/phpunit.xml
 ###< phpunit/phpunit ###

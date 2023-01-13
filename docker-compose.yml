@@ -44,7 +44,6 @@ services:
             - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
         volumes:
             - ./logs/nginx:/var/log/nginx:Z
-            - ./phpfpm/symfony:/var/www/symfony:Z
 
     phpmyadmin:
         image: bitnami/phpmyadmin:5-debian-11
@@ -64,3 +63,4 @@ services:
 volumes:
   mysql_data:
     driver: local
+  phpfpm_sock:
