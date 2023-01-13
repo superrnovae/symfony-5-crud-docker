@@ -1,10 +1,12 @@
 version: '3.9'
 
+# shared network
 networks:
   app-tier:
     driver: bridge
 
 services:
+    # MySQL image
     mysql:
         image: bitnami/mysql:8.0-debian-11
         ports:
@@ -18,7 +20,8 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
             - mysql_data:/bitnami/mysql/data:Z
-
+    
+    # phpfpm image
     phpfpm:
         build: 
           context: ./phpfpm
@@ -29,6 +32,7 @@ services:
         depends_on:
             - mysql
 
+    # nging image
     nginx:
         build: 
             context: ./nginx
@@ -45,6 +49,7 @@ services:
         volumes:
             - ./logs/nginx:/var/log/nginx:Z
 
+    #phpmyadmin image
     phpmyadmin:
         image: bitnami/phpmyadmin:5-debian-11
         environment:
@@ -60,6 +65,7 @@ services:
         depends_on:
             - mysql
 
+# shared volumes
 volumes:
   mysql_data:
     driver: local
