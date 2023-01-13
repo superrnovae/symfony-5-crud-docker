@@ -1,32 +1,52 @@
 version: '3.9'
+
+networks:
+  app-tier:
+    driver: bridge
+
 services:
     db:
         image: bitnami/mysql:8.0-debian-11
         ports:
-            - "${MYSQL_PORT}:3306"
+            - "3306:3306"
+        networks:
+            - app-tier
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
-            - 'mysql_data:/bitnami/mysql/data'
+            - mysql_data:/bitnami/mysql/data:Z
 
-    php:
-        build:
-            context: ./php-fpm
-            args:
-                PHP_XDEBUG_MODE: ${PHP_XDEBUG_MODE}
-                PHP_XDEBUG_CLIENT_PORT: ${PHP_XDEBUG_CLIENT_PORT}
-                PHP_XDEBUG_CLIENT_HOST: ${PHP_XDEBUG_CLIENT_HOST}
-                SYMFONY_CLI_VERSION: 4.27.4
+    phpfpm:
+        build: 
+          context: ./phpfpm
+        networks:
+            - app-tier
         ports:
             - "9000:9000"
         volumes:
-            - ./symfony:/var/www/symfony:cached
-            - ./logs/symfony:/var/www/symfony/var/log:cached
+            - ./logs/symfony:/var/www/symfony/var/log:Z
         depends_on:
             - db
+
+    nginx:
+        build: 
+            context: ./nginx
+        networks:
+            - app-tier
+        ports:
+            - "8081:80"
+        depends_on:
+            - phpfpm
+        environment:
+            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+            - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+            - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
+        volumes:
+            - ./logs/nginx:/var/log/nginx:Z
+            - ./phpfpm/symfony:/var/www/symfony:Z
 
     phpmyadmin:
         image: bitnami/phpmyadmin:5-debian-11
@@ -34,29 +54,13 @@ services:
             - PMA_HOST=db
             - PMA_USER=root
             - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        networks:
+            - app-tier
         ports:
             - '8080:8080'
-            - '8443:443'
+            - '8443:8443'
         restart: unless-stopped
 
-    nginx:
-        build: 
-            context: ./nginx
-            args:
-                NGINX_SYMFONY_SERVER_NAME: ${NGINX_SYMFONY_SERVER_NAME}
-                KIBANA_PORT: ${KIBANA_PORT}
-        ports:
-            - "8081:80"
-        depends_on:
-            - php
-        environment:
-            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
-            - NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
-            - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
-            - NGINX_SYMFONY_SERVER_NAME=${NGINX_SYMFONY_SERVER_NAME}
-        volumes:
-            - ./symfony:/var/www/symfony
-        
 volumes:
   mysql_data:
     driver: local
