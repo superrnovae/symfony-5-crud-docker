@@ -5,10 +5,10 @@ networks:
     driver: bridge
 
 services:
-    db:
+    mysql:
         image: bitnami/mysql:8.0-debian-11
         ports:
-            - "3306:3306"
+            - "${MYSQL_PORT}:3306"
         networks:
             - app-tier
         environment:
@@ -24,12 +24,10 @@ services:
           context: ./phpfpm
         networks:
             - app-tier
-        ports:
-            - "9000:9000"
         volumes:
             - ./logs/symfony:/var/www/symfony/var/log:Z
         depends_on:
-            - db
+            - mysql
 
     nginx:
         build: 
@@ -37,7 +35,7 @@ services:
         networks:
             - app-tier
         ports:
-            - "8081:80"
+            - "${NGINX_PORT}:80"
         depends_on:
             - phpfpm
         environment:
@@ -51,15 +49,17 @@ services:
     phpmyadmin:
         image: bitnami/phpmyadmin:5-debian-11
         environment:
-            - PMA_HOST=db
+            - PMA_HOST=mysql
             - PMA_USER=root
             - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
         networks:
             - app-tier
         ports:
-            - '8080:8080'
-            - '8443:8443'
+            - '${PMA_PORT}:8080'
+            - '${PMA_PORT_SSL}:8443'
         restart: unless-stopped
+        depends_on:
+            - mysql
 
 volumes:
   mysql_data:
