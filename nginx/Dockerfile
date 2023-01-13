@@ -1,16 +1,10 @@
 FROM nginx:1.23.3
 
-RUN mkdir -p /etc/nginx/templates \
-    mkdir -p /tmp/nginx
+RUN mkdir /etc/nginx/sites-enabled
 
-COPY nginx.conf /etc/nginx/
-COPY templates/* /etc/nginx/templates/
-COPY html/index.html.template /tmp/nginx/
-
-ARG NGINX_SYMFONY_SERVER_NAME
-ARG KIBANA_PORT
-RUN envsubst < /tmp/nginx/index.html.template > /usr/share/nginx/html/index.html; \
-    rm -fR /tmp/nginx
+COPY ./config/nginx.conf /etc/nginx/nginx.conf
+COPY ./config/fastcgi.conf /etc/nginx/fastcgi.conf
+COPY ./config/default.conf /etc/nginx/conf.d/default.conf
 
 CMD ["nginx"]
 
