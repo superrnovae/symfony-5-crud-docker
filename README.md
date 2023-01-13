@@ -1,44 +1,21 @@
-# les étapes à suivre
-#1- Création du projet:
+# Symfony 5 CRUD Docker
 
-  composer create-project symfony/website-skeleton nom_du_projet
+A [Dockerized](https://www.docker.com/) [Symfony](https://symfony.com) 5 CRUD project, with full [HTTP/2](https://symfony.com/doc/current/weblink.html), HTTP/3 and HTTPS support.
 
-#2- installation doctrine: bibliothèque fournir des outils puissants pour rendre les interactions avec les bases de données faciles et flexibles.
+![CI](https://github.com/superrnovae/symfony-5-crud-docker/workflows/CI/badge.svg)
 
-    a- composer require symfony/orm-pack 
+## Getting Started
 
-    b- composer require symfony/maker-bundle --dev 
+1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
+2. Run `docker compose build --pull --no-cache` to build fresh images
+3. Run `docker compose up` (the logs will be displayed in the current shell)
+4. Open `https://localhost:8081` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
+5. Run `docker compose down --remove-orphans` to stop the Docker containers.
 
-#3-configuration base de donne:
+**Enjoy!**
 
-    Les paramètres de la connexion à la base de donne sont stockées dans la variable DATABASE_URL qui existe dans la fichier .env.
-    Exemple:
-    DATABASE_URL=‘mysql://db_user:db_password@127.0.0.1:3306/db_name’
-    db_user: root
-    db_password: par défaut vide 
-    db_name: nom de votre base par exemple 'crud_symfony'
+## Docs
 
-DATABASE_URL='mysql://root:@127.0.0.1:3306/crud_symfony'
+## Credits
 
-#4- création base de données :
-
-php bin/console doctrine:database:create
-
-#5- Création d’entité:
-
- php bin/console make:entity
- >nom de classe/entite
-
-#6- Migrations: Création des tables / schémas de la base de données
-
-    a- php bin/console make:migration 
-    b- php bin/console doctrine:migrations:migrate 
-
-#7- Création crud
-
-php bin/console make:crud 
-  >nom du classe
-
-#8- Exécution du projet
-
-    symfony server:start
+Created by [superrnovae](https://github.com/superrnovae), co-maintained by [Yalinkilinc-Omer](https://github.com/Yalinkilinc-Omer).
