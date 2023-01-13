@@ -1,10 +1,5 @@
 version: '3.9'
 
-# shared network
-networks:
-  app-tier:
-    driver: bridge
-
 services:
     # MySQL image
     mysql:
@@ -19,7 +14,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         volumes:
-            - mysql_data:/bitnami/mysql/data:Z
+            - mysql_data:/opt/bitnami/mysql/data:Z
     
     # phpfpm image
     phpfpm:
@@ -29,6 +24,7 @@ services:
             - app-tier
         volumes:
             - ./logs/symfony:/var/www/symfony/var/log:Z
+            - "phpsocket:/var/run"
         depends_on:
             - mysql
 
@@ -48,6 +44,7 @@ services:
             - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
         volumes:
             - ./logs/nginx:/var/log/nginx:Z
+            - "phpsocket:/var/run"
 
     #phpmyadmin image
     phpmyadmin:
@@ -65,8 +62,14 @@ services:
         depends_on:
             - mysql
 
+
+# shared networks
+networks:
+  app-tier:
+    driver: bridge
+
 # shared volumes
 volumes:
   mysql_data:
     driver: local
-  phpfpm_sock:
+  phpsocket:
